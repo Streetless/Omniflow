@@ -7,8 +7,8 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 enum class Mode {
-    RELEASE,
-    UPDATE,
+    TEMPORARY, // Upload to temporary bucket
+    RELEASE, // Use temporary bucket content, to create a new version
 }
 
 enum class ProjectType {
@@ -26,7 +26,7 @@ class Args(parser: ArgParser) {
     val version by parser.storing(
         "-v", "--version",
         help = "The version to push"
-    )
+    ).addValidator { if (value.isBlank()) throw SystemExitException("Version cannot be empty", 1) }
 
     val projectType by parser.mapping(
         "--editor" to ProjectType.EDITOR,
@@ -36,7 +36,7 @@ class Args(parser: ArgParser) {
 
     val mode by parser.mapping(
         "--release" to Mode.RELEASE,
-        "--update" to Mode.UPDATE,
+        "--temporary" to Mode.TEMPORARY,
         help = "The mode to use"
-    ).default(Mode.RELEASE)
+    ).default(Mode.TEMPORARY)
 }
