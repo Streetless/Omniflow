@@ -1,10 +1,7 @@
 package re.alwyn974.omniflow
 
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.minio.BucketExistsArgs
-import io.minio.MakeBucketArgs
-import io.minio.MinioClient
-import io.minio.UploadObjectArgs
+import io.minio.*
 import re.alwyn974.omniflow.config.MinioConfig
 import java.nio.file.Path
 import kotlin.io.path.isDirectory
@@ -32,11 +29,13 @@ class Minio {
     fun uploadFile(bucketName: String, filePath: Path, prefix: String = "") {
         val remotePath = prefix + filePath.fileName.toFile()
         logger.debug { "Uploading $filePath to $bucketName with remote path $remotePath" }
-        minioClient.uploadObject(UploadObjectArgs.builder()
-            .bucket(bucketName)
-            .filename(filePath.toString())
-            .`object`(remotePath)
-            .build())
+        minioClient.uploadObject(
+            UploadObjectArgs.builder()
+                .bucket(bucketName)
+                .filename(filePath.toString())
+                .`object`(remotePath)
+                .build()
+        )
     }
 
     fun uploadDir(bucketName: String, dir: Path, prefix: String = "") {
@@ -50,6 +49,17 @@ class Minio {
                 uploadDir(bucketName, it, prefix)
             else
                 uploadFile(bucketName, dir.resolve(it.fileName), prefix)
+        }
+    }
+
+    fun listDirectory(bucketName: String, recursive: Boolean = true) {
+        val results = minioClient.listObjects(
+            ListObjectsArgs.builder().includeUserMetadata(true).recursive(recursive)
+                .bucket(bucketName).build()
+        )
+        results.forEach { result ->
+            val item = result.get()
+            logger.info { "File: ${item.etag()} ${item.size()} ${item.objectName()} ${item.storageClass()} ${item.owner()} ${item.userMetadata()} ${item.userTags()} ${item.isLatest} ${item.versionId()} ${item.isDir} ${item.isDeleteMarker}" }
         }
     }
 

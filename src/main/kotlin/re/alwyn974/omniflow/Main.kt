@@ -4,7 +4,6 @@ import com.xenomachina.argparser.ArgParser
 import com.xenomachina.argparser.mainBody
 import io.github.cdimascio.dotenv.dotenv
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.minio.ListObjectsArgs
 import re.alwyn974.omniflow.config.MinioConfig
 import java.util.*
 
@@ -34,13 +33,10 @@ fun start(args: Args, minioConfig: MinioConfig) {
     minio.ensureBucket(minioConfig.vrBucketName)
     minio.ensureBucket(minioConfig.editorBucketName)
 
-    logger.info { "Uploading ${args.directory} to ${minioConfig.tempBucketName}" }
+//    logger.info { "Uploading ${args.directory} to ${minioConfig.tempBucketName}" }
     val prefix = "%s/v%s/".format(args.projectType.name.lowercase(Locale.getDefault()), args.version)
 
-//    minio.minioClient.listObjects(ListObjectsArgs.builder().bucket(minioConfig.tempBucketName).build()).forEach {
-//        val item = it.get();
-//        logger.info { "${item.etag()} ${item.size()} ${item.objectName()} ${item.storageClass()} ${item.owner()} ${item.userMetadata()} ${item.userTags()} ${item.isLatest()} ${item.versionId()} ${item.isDir()} ${item.isDeleteMarker()} ${item.userMetadata()} ${item.userTags()} ${item.isLatest()} ${item.versionId()} ${item.isDir()} ${item.isDeleteMarker()}" }
-//    }
+    minio.listDirectory(minioConfig.tempBucketName)
 
 //    minio.uploadDir(minioConfig.tempBucketName, args.directory)
 }
