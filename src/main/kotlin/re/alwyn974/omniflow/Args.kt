@@ -20,7 +20,7 @@ class Args(parser: ArgParser) {
     val directory: Path by parser.storing(
         "-d", "--directory",
         help = "The directory to push"
-    ) { Paths.get(this) }
+    ) { Paths.get(this).normalize() }
         .addValidator { if (!value.toFile().exists()) throw SystemExitException("Directory does not exist", 1) }
 
     val version by parser.storing(
@@ -39,4 +39,9 @@ class Args(parser: ArgParser) {
         "--temporary" to Mode.TEMPORARY,
         help = "The mode to use"
     ).default(Mode.TEMPORARY)
+
+    val clear by parser.flagging(
+        "--clear", "-c",
+        help = "Clear directory version before uploading"
+    ).default(false)
 }

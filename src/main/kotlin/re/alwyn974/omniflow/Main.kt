@@ -5,7 +5,7 @@ import com.xenomachina.argparser.mainBody
 import io.github.cdimascio.dotenv.dotenv
 import io.github.oshai.kotlinlogging.KotlinLogging
 import re.alwyn974.omniflow.config.MinioConfig
-import java.util.*
+import java.nio.file.Path
 
 val logger = KotlinLogging.logger("OmniFlow")
 
@@ -26,17 +26,20 @@ fun main(args: Array<String>) = mainBody {
 }
 
 fun start(args: Args, minioConfig: MinioConfig) {
-    val minio = Minio()
-    minio.init(minioConfig)
+    Minio().use { minio ->
+        minio.init(minioConfig)
+        minio.ensureBucket(minioConfig.tempBucketName)
+        minio.ensureBucket(minioConfig.vrBucketName)
+        minio.ensureBucket(minioConfig.editorBucketName)
 
-    minio.ensureBucket(minioConfig.tempBucketName)
-    minio.ensureBucket(minioConfig.vrBucketName)
-    minio.ensureBucket(minioConfig.editorBucketName)
+        val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}");
 
-//    logger.info { "Uploading ${args.directory} to ${minioConfig.tempBucketName}" }
-    val prefix = "%s/v%s/".format(args.projectType.name.lowercase(Locale.getDefault()), args.version)
+//      val results = minio.listDirectory(minioConfig.tempBucketName)
+//      results.forEach { result ->
+//          val item = result.get()
+//          logger.info { "File: ${item.etag()} ${item.size()} ${item.objectName()} ${item.storageClass()} ${item.owner()} ${item.userMetadata()} ${item.userTags()} ${item.isLatest} ${item.versionId()} ${item.isDir} ${item.isDeleteMarker}" }
+//      }
 
-    minio.listDirectory(minioConfig.tempBucketName)
-
-//    minio.uploadDir(minioConfig.tempBucketName, args.directory)
+        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
+    }
 }

@@ -2,15 +2,17 @@ package re.alwyn974.omniflow
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.minio.*
+import io.minio.messages.Item
 import re.alwyn974.omniflow.config.MinioConfig
+import java.nio.file.FileVisitOption
+import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Collectors
 import kotlin.io.path.isDirectory
-import kotlin.io.path.listDirectoryEntries
 
-class Minio {
+class Minio : AutoCloseable {
     private val logger = KotlinLogging.logger("Minio")
-    lateinit var minioClient: MinioClient
-        private set;
+    private lateinit var minioClient: MinioClient
 
     fun init(minioConfig: MinioConfig) {
         minioClient = MinioClient.builder()
@@ -26,10 +28,11 @@ class Minio {
         }
     }
 
-    fun uploadFile(bucketName: String, filePath: Path, prefix: String = "") {
-        val remotePath = prefix + filePath.fileName.toFile()
+    @Throws(Exception::class)
+    fun uploadFile(bucketName: String, filePath: Path, objectName: Path, prefix: Path): ObjectWriteResponse {
+        val remotePath = prefix.resolve(objectName).toLinux()
         logger.debug { "Uploading $filePath to $bucketName with remote path $remotePath" }
-        minioClient.uploadObject(
+        return minioClient.uploadObject(
             UploadObjectArgs.builder()
                 .bucket(bucketName)
                 .filename(filePath.toString())
@@ -38,29 +41,46 @@ class Minio {
         )
     }
 
-    fun uploadDir(bucketName: String, dir: Path, prefix: String = "") {
-        if (!dir.isDirectory()) {
-            logger.error { "$dir is not a directory" }
-            return
-        }
+    @Throws(IllegalArgumentException::class)
+    fun uploadDir(bucketName: String, dir: Path, prefix: Path = Path.of("")): List<ObjectWriteResponse> {
+        if (!dir.isDirectory())
+            throw IllegalArgumentException("$dir is not a directory")
+
         logger.debug { "Uploading directory $dir to $bucketName" }
-        dir.listDirectoryEntries().forEach {
-            if (it.isDirectory())
-                uploadDir(bucketName, it, prefix)
-            else
-                uploadFile(bucketName, dir.resolve(it.fileName), prefix)
+        return Files.walk(dir, FileVisitOption.FOLLOW_LINKS).use { paths ->
+            paths.filter { !it.isDirectory() }
+                .map { uploadFile(bucketName, it, dir.relativize(it), prefix) }
+                .collect(Collectors.toList())
         }
     }
 
-    fun listDirectory(bucketName: String, recursive: Boolean = true) {
-        val results = minioClient.listObjects(
-            ListObjectsArgs.builder().includeUserMetadata(true).recursive(recursive)
-                .bucket(bucketName).build()
+    fun listDirectory(
+        bucketName: String,
+        recursive: Boolean = true,
+        includeUserMetadata: Boolean = true
+    ): Iterable<Result<Item>> {
+        return minioClient.listObjects(
+            ListObjectsArgs.builder()
+                .includeUserMetadata(includeUserMetadata)
+                .recursive(recursive)
+                .bucket(bucketName)
+                .build()
         )
-        results.forEach { result ->
-            val item = result.get()
-            logger.info { "File: ${item.etag()} ${item.size()} ${item.objectName()} ${item.storageClass()} ${item.owner()} ${item.userMetadata()} ${item.userTags()} ${item.isLatest} ${item.versionId()} ${item.isDir} ${item.isDeleteMarker}" }
-        }
     }
 
+    fun clearDirectory(bucketName: String, directory: String) {
+        val files = listDirectory(bucketName).filter { it.get().objectName().startsWith(directory) }
+        println(files)
+    }
+
+    private fun Path.toLinux(): String {
+        if (!System.getProperty("os.name").lowercase().contains("win"))
+            return this.toString()
+        return this.toString().replace("\\", "/")
+    }
+
+    override fun close() {
+        logger.info { "Closing Minio client" }
+        this.minioClient.close();
+    }
 }
