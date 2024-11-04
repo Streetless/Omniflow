@@ -54,7 +54,10 @@ class Args(parser: ArgParser) {
     val clear by parser.flagging(
         "--clear", "-c",
         help = "Clear directory version before uploading"
-    ).default(false)
+    ).default(false).addValidator {
+        if (mode != Mode.TEMPORARY)
+            throw SystemExitException("Clear option is only available in temporary mode", 1)
+    }
 
     val buildType by parser.mapping(
         "--release" to BuildType.RELEASE,
