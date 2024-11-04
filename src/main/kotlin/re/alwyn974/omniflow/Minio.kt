@@ -9,6 +9,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 import kotlin.io.path.isDirectory
+import kotlin.math.log
 
 class Minio : AutoCloseable {
     private val logger = KotlinLogging.logger("Minio")
@@ -78,6 +79,42 @@ class Minio : AutoCloseable {
     }
 
     /**
+     * Download a file from a bucket.
+     * @param bucketName The name of the bucket
+     * @param objectName The name of the object in the bucket
+     * @param filePath The path to save the file
+     */
+    fun downloadFile(bucketName: String, objectName: String, filePath: Path) {
+        logger.debug { "Downloading $objectName from $bucketName to $filePath" }
+        minioClient.downloadObject(
+            DownloadObjectArgs.builder()
+                .bucket(bucketName)
+                .`object`(objectName)
+                .filename(filePath.toString())
+                .build()
+        )
+    }
+
+    /**
+     * Download a directory from a bucket.
+     * @param bucketName The name of the bucket
+     * @param fromDir The directory to download
+     * @param toDir The directory to save the files
+     */
+    fun downloadDir(bucketName: String, fromDir: Path, toDir: Path) {
+        logger.debug { "Downloading directory $fromDir from $bucketName to $toDir" }
+        val files = listDirectory(bucketName, fromDir)
+        files.forEach {
+            val filePath = toDir.resolve(fromDir.relativize(Path.of(it.get().objectName())))
+            if (!Files.exists(filePath.parent)) {
+                logger.debug { "Creating directory ${filePath.parent}" }
+                Files.createDirectories(filePath.parent)
+            }
+            downloadFile(bucketName, it.get().objectName(), filePath)
+        }
+    }
+
+    /**
      * List all files in a bucket.
      * @param bucketName The name of the bucket
      * @param recursive If the listing should be recursive
@@ -86,6 +123,7 @@ class Minio : AutoCloseable {
      */
     fun listDirectory(
         bucketName: String,
+        directory: Path = Path.of(""),
         recursive: Boolean = true,
         includeUserMetadata: Boolean = true
     ): Iterable<Result<Item>> {
@@ -93,6 +131,7 @@ class Minio : AutoCloseable {
             ListObjectsArgs.builder()
                 .includeUserMetadata(includeUserMetadata)
                 .recursive(recursive)
+                .prefix(directory.toLinux())
                 .bucket(bucketName)
                 .build()
         )
