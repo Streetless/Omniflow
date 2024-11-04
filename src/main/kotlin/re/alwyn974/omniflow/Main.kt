@@ -19,6 +19,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.function.Predicate
 import kotlin.io.path.isDirectory
+import kotlin.math.log
 
 val logger = KotlinLogging.logger("OmniFlow")
 
@@ -77,13 +78,14 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
     logger.info { "Downloaded temporary version to $tempDir" }
 
     val files = mutableListOf<FileModel>()
+    logger.info { "Creating version files" }
     Files.walk(tempDir).filter(Predicate.not(Path::isDirectory)).forEach {
         val relativePath = tempDir.relativize(it)
         val bytes = DigestUtils.digest(DigestUtils.getSha1Digest(), it.toFile())
         val hash = DigestUtils.sha1Hex(bytes)
         val size = it.toFile().length()
         val remotePath = prefix.resolve(relativePath)
-        logger.info { "Uploaded ${it.fileName} to $bucket with remote path $remotePath" }
+        logger.debug { "Adding ${it.fileName} to version ${args.version} with remote path $remotePath" }
         files.add(FileModel(relativePath.toString(), hash, size, remotePath.toLinux()))
     }
 
@@ -91,6 +93,7 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
     val versionJson = json.encodeToString(version)
     Files.writeString(tempDir.resolve("files.json"), versionJson)
 
+    logger.info { "Creating version manifest" }
     val versionManifest = VersionManifest(
         args.version,
         args.buildType.name.lowercase(),
@@ -103,11 +106,12 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
             listOf(versionManifest)
         )
     } else {
-        val newManifest = currentManifest.copy(versions = currentManifest.versions + versionManifest)
+        val newManifest = addVersionOrReplace(currentManifest, versionManifest)
         newManifest.latest.setVersionFromBuildType(args.version, args.buildType)
         newManifest
     }
 
+    logger.info { "Creating manifest" }
     Files.writeString(rootTempDir.resolve("manifest.json"), json.encodeToString(manifest))
 
     // TODO: upload to release bucket
@@ -131,4 +135,14 @@ fun getManifest(url: String): ManifestModel? = runBlocking {
         logger.error { "Failed to get manifest from $url" }
         return@runBlocking null
     }
+}
+
+fun addVersionOrReplace(manifest: ManifestModel, version: VersionManifest): ManifestModel {
+    val newVersions = manifest.versions.toMutableList()
+    val index = newVersions.indexOfFirst { it.version == version.version }
+    if (index != -1)
+        newVersions[index] = version
+    else
+        newVersions.add(version)
+    return manifest.copy(versions = newVersions)
 }
