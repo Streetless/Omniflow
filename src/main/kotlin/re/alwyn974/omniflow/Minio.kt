@@ -68,9 +68,17 @@ class Minio : AutoCloseable {
         )
     }
 
-    fun clearDirectory(bucketName: String, directory: String) {
-        val files = listDirectory(bucketName).filter { it.get().objectName().startsWith(directory) }
-        println(files)
+    fun clearDirectory(bucketName: String, directory: Path) {
+        val files = listDirectory(bucketName).filter { it.get().objectName().startsWith(directory.toLinux()) }
+        files.forEach {
+            logger.debug { "Removing ${it.get().objectName()}" }
+            minioClient.removeObject(
+                RemoveObjectArgs.builder()
+                    .bucket(bucketName)
+                    .`object`(it.get().objectName())
+                    .build()
+            )
+        }
     }
 
     private fun Path.toLinux(): String {

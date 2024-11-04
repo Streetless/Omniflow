@@ -34,12 +34,8 @@ fun start(args: Args, minioConfig: MinioConfig) {
 
         val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}")
 
-//      val results = minio.listDirectory(minioConfig.tempBucketName)
-//      results.forEach { result ->
-//          val item = result.get()
-//          logger.info { "File: ${item.etag()} ${item.size()} ${item.objectName()} ${item.storageClass()} ${item.owner()} ${item.userMetadata()} ${item.userTags()} ${item.isLatest} ${item.versionId()} ${item.isDir} ${item.isDeleteMarker}" }
-//      }
+//        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
 
-        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
+        minio.clearDirectory(minioConfig.tempBucketName, prefix)
     }
 }
