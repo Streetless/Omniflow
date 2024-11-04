@@ -3,13 +3,13 @@ package re.alwyn974.omniflow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.minio.*
 import io.minio.messages.Item
-import re.alwyn974.omniflow.config.MinioConfig
+import re.alwyn974.omniflow.config.Config
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Collectors
 import kotlin.io.path.isDirectory
-import kotlin.math.log
+import re.alwyn974.omniflow.Extensions.Companion.toLinux
 
 class Minio : AutoCloseable {
     private val logger = KotlinLogging.logger("Minio")
@@ -17,12 +17,12 @@ class Minio : AutoCloseable {
 
     /**
      * Initialize the Minio client.
-     * @param minioConfig The Minio configuration
+     * @param config The Minio configuration
      */
-    fun init(minioConfig: MinioConfig) {
+    fun init(config: Config) {
         minioClient = MinioClient.builder()
-            .endpoint(minioConfig.endpoint, minioConfig.port, minioConfig.useSSL)
-            .credentials(minioConfig.accessKey, minioConfig.secretKey)
+            .endpoint(config.endpoint, config.port, config.useSSL)
+            .credentials(config.accessKey, config.secretKey)
             .build()
     }
 
@@ -105,12 +105,13 @@ class Minio : AutoCloseable {
         logger.debug { "Downloading directory $fromDir from $bucketName to $toDir" }
         val files = listDirectory(bucketName, fromDir)
         files.forEach {
-            val filePath = toDir.resolve(fromDir.relativize(Path.of(it.get().objectName())))
+            val file = it.get()
+            val filePath = toDir.resolve(fromDir.relativize(Path.of(file.objectName())))
             if (!Files.exists(filePath.parent)) {
                 logger.debug { "Creating directory ${filePath.parent}" }
                 Files.createDirectories(filePath.parent)
             }
-            downloadFile(bucketName, it.get().objectName(), filePath)
+            downloadFile(bucketName, file.objectName(), filePath)
         }
     }
 
@@ -212,16 +213,6 @@ class Minio : AutoCloseable {
                 .`object`(from.toLinux())
                 .build()
         )
-    }
-
-    /**
-     * Convert a path to a Linux path.
-     * Windows is trash.
-     */
-    private fun Path.toLinux(): String {
-        if (!System.getProperty("os.name").lowercase().contains("win"))
-            return this.toString()
-        return this.toString().replace("\\", "/")
     }
 
     /**

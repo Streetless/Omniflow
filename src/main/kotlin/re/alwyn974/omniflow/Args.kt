@@ -26,7 +26,13 @@ class Args(parser: ArgParser) {
         "-d", "--directory",
         help = "The directory to push"
     ) { Paths.get(this).normalize() }
-        .addValidator { if (!value.toFile().exists()) throw SystemExitException("Directory does not exist", 1) }
+        .default(Path.of(""))
+        .addValidator {
+            if (mode == Mode.NEW)
+                return@addValidator
+            if (!value.toFile().exists())
+                throw SystemExitException("Directory does not exist", 1)
+        }
 
     val version by parser.storing(
         "-v", "--version",
