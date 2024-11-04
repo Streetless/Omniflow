@@ -5,7 +5,10 @@ import com.xenomachina.argparser.mainBody
 import io.github.cdimascio.dotenv.dotenv
 import io.github.oshai.kotlinlogging.KotlinLogging
 import re.alwyn974.omniflow.config.MinioConfig
+import java.nio.file.FileVisitOption
 import java.nio.file.Path
+import java.util.stream.Collectors
+import kotlin.math.log
 
 val logger = KotlinLogging.logger("OmniFlow")
 
@@ -34,9 +37,24 @@ fun start(args: Args, minioConfig: MinioConfig) {
         minio.ensureBucket(minioConfig.vrBucketName)
         minio.ensureBucket(minioConfig.editorBucketName)
 
-        val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}")
 
-//        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
-//        minio.clearDirectory(minioConfig.tempBucketName, prefix)
+        when (args.mode) {
+            Mode.NEW -> makeNewVersion(args, minioConfig, minio)
+            Mode.TEMPORARY -> makeTemporaryVersion(args, minioConfig, minio)
+        }
     }
+}
+
+fun makeNewVersion(args: Args, minioConfig: MinioConfig, minio: Minio) {
+    val prefix = Path.of(args.projectType.name.lowercase(), args.buildType.name.lowercase(), "v${args.version}")
+}
+
+fun makeTemporaryVersion(args: Args, minioConfig: MinioConfig, minio: Minio) {
+    val prefix = Path.of(args.projectType.name.lowercase(), args.buildType.name.lowercase(), "v${args.version}")
+    logger.info { "Creating temporary version ${args.version} of type ${args.buildType}" }
+    if (args.clear) {
+        logger.warn { "Clear mode enable, directory will be cleared before upload" }
+        minio.clearDirectory(minioConfig.tempBucketName, prefix)
+    }
+    minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
 }
