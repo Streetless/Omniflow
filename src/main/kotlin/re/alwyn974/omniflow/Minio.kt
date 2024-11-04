@@ -81,6 +81,6 @@ class Minio : AutoCloseable {
 
     override fun close() {
         logger.info { "Closing Minio client" }
-        this.minioClient.close();
+        this.minioClient.close()
     }
 }

@@ -32,7 +32,7 @@ fun start(args: Args, minioConfig: MinioConfig) {
         minio.ensureBucket(minioConfig.vrBucketName)
         minio.ensureBucket(minioConfig.editorBucketName)
 
-        val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}");
+        val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}")
 
 //      val results = minio.listDirectory(minioConfig.tempBucketName)
 //      results.forEach { result ->
