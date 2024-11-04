@@ -14,6 +14,10 @@ class Minio : AutoCloseable {
     private val logger = KotlinLogging.logger("Minio")
     private lateinit var minioClient: MinioClient
 
+    /**
+     * Initialize the Minio client.
+     * @param minioConfig The Minio configuration
+     */
     fun init(minioConfig: MinioConfig) {
         minioClient = MinioClient.builder()
             .endpoint(minioConfig.endpoint, minioConfig.port, minioConfig.useSSL)
@@ -21,6 +25,10 @@ class Minio : AutoCloseable {
             .build()
     }
 
+    /**
+     * Ensure a bucket exists. It will create it if it doesn't.
+     * @param bucketName The name of the bucket
+     */
     fun ensureBucket(bucketName: String) {
         if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {
             logger.info { "$bucketName didn't exist, creating it" }
@@ -28,7 +36,14 @@ class Minio : AutoCloseable {
         }
     }
 
-    @Throws(Exception::class)
+    /**
+     * Upload a file to a bucket.
+     * @param bucketName The name of the bucket
+     * @param filePath The path of the file to upload
+     * @param objectName The name of the object in the bucket
+     * @param prefix The prefix to add to the remote path
+     * @return The ObjectWriteResponse
+     */
     fun uploadFile(bucketName: String, filePath: Path, objectName: Path, prefix: Path): ObjectWriteResponse {
         val remotePath = prefix.resolve(objectName).toLinux()
         logger.debug { "Uploading $filePath to $bucketName with remote path $remotePath" }
@@ -41,6 +56,14 @@ class Minio : AutoCloseable {
         )
     }
 
+    /**
+     * Upload a directory to a bucket.
+     * @param bucketName The name of the bucket
+     * @param dir The directory to upload
+     * @param prefix The prefix to add to the remote path
+     * @return A list of ObjectWriteResponse
+     * @throws IllegalArgumentException If the path is not a directory
+     */
     @Throws(IllegalArgumentException::class)
     fun uploadDir(bucketName: String, dir: Path, prefix: Path = Path.of("")): List<ObjectWriteResponse> {
         if (!dir.isDirectory())
@@ -54,6 +77,13 @@ class Minio : AutoCloseable {
         }
     }
 
+    /**
+     * List all files in a bucket.
+     * @param bucketName The name of the bucket
+     * @param recursive If the listing should be recursive
+     * @param includeUserMetadata If the listing should include user metadata
+     * @return An iterable of Result<Item>
+     */
     fun listDirectory(
         bucketName: String,
         recursive: Boolean = true,
@@ -68,6 +98,11 @@ class Minio : AutoCloseable {
         )
     }
 
+    /**
+     * Clear a directory in a bucket.
+     * @param bucketName The name of the bucket
+     * @param directory The directory to clear
+     */
     fun clearDirectory(bucketName: String, directory: Path) {
         val files = listDirectory(bucketName).filter { it.get().objectName().startsWith(directory.toLinux()) }
         files.forEach {
@@ -81,6 +116,13 @@ class Minio : AutoCloseable {
         }
     }
 
+    /**
+     * Copy a file from a path to another in different buckets.
+     * @param fromBucket The source bucket
+     * @param toBucket The destination bucket
+     * @param fromPath The source path
+     * @param toPath The destination path
+     */
     fun copyFileFromBucket(fromBucket: String, toBucket: String, fromPath: Path, toPath: Path) {
         logger.debug { "Copying $fromPath from $fromBucket to $toPath in $toBucket" }
         minioClient.copyObject(
@@ -92,6 +134,30 @@ class Minio : AutoCloseable {
         )
     }
 
+    /**
+     * Copy a file from a path to another in the same bucket.
+     * @param bucketName The bucket name
+     * @param from The source path
+     * @param to The destination path
+     */
+    fun copyFile(bucketName: String, from: Path, to: Path) {
+        logger.debug { "Copying $from to $to in $bucketName" }
+        minioClient.copyObject(
+            CopyObjectArgs.builder()
+                .source(CopySource.builder().bucket(bucketName).`object`(from.toLinux()).build())
+                .bucket(bucketName)
+                .`object`(to.toLinux())
+                .build()
+        )
+    }
+
+
+    /**
+     * Move a file from a path to another in the same bucket.
+     * @param bucketName The name of the bucket
+     * @param from The path of the file to move
+     * @param to The path of the file to move to
+     */
     fun moveFile(bucketName: String, from: Path, to: Path) {
         logger.debug { "Moving $from to $to in $bucketName" }
         minioClient.copyObject(
@@ -109,12 +175,20 @@ class Minio : AutoCloseable {
         )
     }
 
+    /**
+     * Convert a path to a Linux path.
+     * Windows is trash.
+     */
     private fun Path.toLinux(): String {
         if (!System.getProperty("os.name").lowercase().contains("win"))
             return this.toString()
         return this.toString().replace("\\", "/")
     }
 
+    /**
+     * Close the Minio client.
+     * @see AutoCloseable
+     */
     override fun close() {
         logger.info { "Closing Minio client" }
         this.minioClient.close()

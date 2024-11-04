@@ -36,13 +36,6 @@ fun start(args: Args, minioConfig: MinioConfig) {
 
         val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}")
 
-        minio.copyFileFromBucket(
-            minioConfig.tempBucketName,
-            minioConfig.editorBucketName,
-            prefix.resolve("envronment-editor.exe"),
-            Path.of(args.buildType.name.lowercase(), "v${args.version}", "envronment-editor.exe")
-        )
-
 //        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
 //        minio.clearDirectory(minioConfig.tempBucketName, prefix)
     }
