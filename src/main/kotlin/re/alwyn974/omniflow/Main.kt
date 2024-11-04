@@ -19,11 +19,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.util.function.Predicate
 import kotlin.io.path.isDirectory
-import kotlin.math.log
 
 val logger = KotlinLogging.logger("OmniFlow")
-
-// create a new version, temp s3 > get all files > hash sha1 + size > make JSON > upload all files to release s3
 
 fun main(args: Array<String>) = mainBody {
     val dotenv = dotenv()
@@ -41,6 +38,11 @@ fun main(args: Array<String>) = mainBody {
     }
 }
 
+/**
+ * Start the process
+ * @param args the arguments
+ * @param config the configuration
+ */
 fun start(args: Args, config: Config) {
     Minio().use { minio ->
         minio.init(config)
@@ -56,6 +58,12 @@ fun start(args: Args, config: Config) {
     }
 }
 
+/**
+ * Create a new version. It will download the temporary version, create a new version manifest and upload it to the bucket
+ * @param args the arguments
+ * @param config the configuration
+ * @param minio the minio client
+ */
 fun makeNewVersion(args: Args, config: Config, minio: Minio) {
     val tempPrefix = Path.of(args.projectType.name.lowercase(), args.buildType.name.lowercase(), "v${args.version}")
     val bucket = if (args.projectType == ProjectType.SIMULATOR) config.vrBucketName else config.editorBucketName
@@ -91,7 +99,8 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
 
     val version = VersionModel(args.version, args.buildType.name.lowercase(), files)
     val versionJson = json.encodeToString(version)
-    Files.writeString(tempDir.resolve("files.json"), versionJson)
+    val versionManifestPath = tempDir.resolve("files.json")
+    Files.writeString(versionManifestPath, versionJson)
 
     logger.info { "Creating version manifest" }
     val versionManifest = VersionManifest(
@@ -112,11 +121,25 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
     }
 
     logger.info { "Creating manifest" }
-    Files.writeString(rootTempDir.resolve("manifest.json"), json.encodeToString(manifest))
+    val manifestPath = rootTempDir.resolve("manifest.json")
+    Files.writeString(manifestPath, json.encodeToString(manifest))
 
-    // TODO: upload to release bucket
+    files.forEach {
+        val fromPath = Path.of(args.projectType.name.lowercase(), it.path);
+        logger.debug { "Uploading ${it.name} to $bucket from ${fromPath.toLinux()} to ${it.path}" }
+        minio.copyFileFromBucket(config.tempBucketName, bucket, fromPath, Path.of(it.path))
+    }
+
+    minio.uploadFile(bucket, manifestPath, Path.of("manifest.json"))
+    minio.uploadFile(bucket, versionManifestPath, prefix.resolve("files.json"))
 }
 
+/**
+ * Create a temporary version. It will upload the directory to the temporary bucket
+ * @param args the arguments
+ * @param config the configuration
+ * @param minio the minio client
+ */
 fun makeTemporaryVersion(args: Args, config: Config, minio: Minio) {
     val prefix = Path.of(args.projectType.name.lowercase(), args.buildType.name.lowercase(), "v${args.version}")
     logger.info { "Creating temporary version ${args.version} of type ${args.buildType}" }
@@ -127,6 +150,11 @@ fun makeTemporaryVersion(args: Args, config: Config, minio: Minio) {
     minio.uploadDir(config.tempBucketName, args.directory, prefix)
 }
 
+/**
+ * Get the manifest from the given url
+ * @param url the url
+ * @return the manifest
+ */
 fun getManifest(url: String): ManifestModel? = runBlocking {
     val client = HttpClient(CIO)
     try {
@@ -137,6 +165,12 @@ fun getManifest(url: String): ManifestModel? = runBlocking {
     }
 }
 
+/**
+ * Add a version to the manifest or replace it if it already exists
+ * @param manifest the manifest
+ * @param version the version
+ * @return the new manifest
+ */
 fun addVersionOrReplace(manifest: ManifestModel, version: VersionManifest): ManifestModel {
     val newVersions = manifest.versions.toMutableList()
     val index = newVersions.indexOfFirst { it.version == version.version }

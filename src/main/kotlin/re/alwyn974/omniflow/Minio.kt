@@ -45,7 +45,7 @@ class Minio : AutoCloseable {
      * @param prefix The prefix to add to the remote path
      * @return The ObjectWriteResponse
      */
-    fun uploadFile(bucketName: String, filePath: Path, objectName: Path, prefix: Path): ObjectWriteResponse {
+    fun uploadFile(bucketName: String, filePath: Path, objectName: Path, prefix: Path = Path.of("")): ObjectWriteResponse {
         val remotePath = prefix.resolve(objectName).toLinux()
         logger.debug { "Uploading $filePath to $bucketName with remote path $remotePath" }
         return minioClient.uploadObject(
