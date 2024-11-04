@@ -19,6 +19,8 @@ fun main(args: Array<String>) = mainBody {
         logger.info { "Version: $version" }
         logger.info { "Project Type: $projectType" }
         logger.info { "Mode: $mode" }
+        logger.info { "Force clear: $clear" }
+        logger.info { "Build Type: $buildType" }
 
         val minioConfig = MinioConfig.fromEnv(dotenv)
         start(this, minioConfig)
@@ -34,8 +36,14 @@ fun start(args: Args, minioConfig: MinioConfig) {
 
         val prefix = Path.of(args.projectType.name.lowercase(), "v${args.version}")
 
-//        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
+        minio.copyFileFromBucket(
+            minioConfig.tempBucketName,
+            minioConfig.editorBucketName,
+            prefix.resolve("envronment-editor.exe"),
+            Path.of(args.buildType.name.lowercase(), "v${args.version}", "envronment-editor.exe")
+        )
 
-        minio.clearDirectory(minioConfig.tempBucketName, prefix)
+//        minio.uploadDir(minioConfig.tempBucketName, args.directory, prefix)
+//        minio.clearDirectory(minioConfig.tempBucketName, prefix)
     }
 }

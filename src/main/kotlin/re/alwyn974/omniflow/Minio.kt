@@ -81,6 +81,34 @@ class Minio : AutoCloseable {
         }
     }
 
+    fun copyFileFromBucket(fromBucket: String, toBucket: String, fromPath: Path, toPath: Path) {
+        logger.debug { "Copying $fromPath from $fromBucket to $toPath in $toBucket" }
+        minioClient.copyObject(
+            CopyObjectArgs.builder()
+                .source(CopySource.builder().bucket(fromBucket).`object`(fromPath.toLinux()).build())
+                .bucket(toBucket)
+                .`object`(toPath.toLinux())
+                .build()
+        )
+    }
+
+    fun moveFile(bucketName: String, from: Path, to: Path) {
+        logger.debug { "Moving $from to $to in $bucketName" }
+        minioClient.copyObject(
+            CopyObjectArgs.builder()
+                .source(CopySource.builder().bucket(bucketName).`object`(from.toLinux()).build())
+                .bucket(bucketName)
+                .`object`(to.toLinux())
+                .build()
+        )
+        minioClient.removeObject(
+            RemoveObjectArgs.builder()
+                .bucket(bucketName)
+                .`object`(from.toLinux())
+                .build()
+        )
+    }
+
     private fun Path.toLinux(): String {
         if (!System.getProperty("os.name").lowercase().contains("win"))
             return this.toString()

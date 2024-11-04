@@ -8,12 +8,17 @@ import java.nio.file.Paths
 
 enum class Mode {
     TEMPORARY, // Upload to temporary bucket
-    RELEASE, // Use temporary bucket content, to create a new version
+    NEW, // Use temporary bucket content, to create a new version
 }
 
 enum class ProjectType {
     EDITOR,
     SIMULATOR,
+}
+
+enum class BuildType {
+    RELEASE,
+    DEBUG,
 }
 
 class Args(parser: ArgParser) {
@@ -35,7 +40,7 @@ class Args(parser: ArgParser) {
     )
 
     val mode by parser.mapping(
-        "--release" to Mode.RELEASE,
+        "--new" to Mode.NEW,
         "--temporary" to Mode.TEMPORARY,
         help = "The mode to use"
     ).default(Mode.TEMPORARY)
@@ -44,4 +49,10 @@ class Args(parser: ArgParser) {
         "--clear", "-c",
         help = "Clear directory version before uploading"
     ).default(false)
+
+    val buildType by parser.mapping(
+        "--release" to BuildType.RELEASE,
+        "--debug" to BuildType.DEBUG,
+        help = "The build type"
+    ).default(BuildType.RELEASE)
 }
