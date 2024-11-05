@@ -30,7 +30,9 @@
       "include-component-in-tag": false,
       "prerelease": false,
       "pull-request-title-pattern": "chore(release): 🚀 Release ${version}",
-      "extra-files": [],
+      "extra-files": [
+        "build.gradle.kts"
+      ],
       "release-type": "java"
     }
   },

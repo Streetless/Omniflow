@@ -10,7 +10,9 @@ plugins {
 }
 
 group = "re.alwyn974.omniflow"
-version = "0.0.1"
+// x-release-please-start-version
+version = "0.0.0"
+// x-release-please-end
 
 repositories {
     mavenCentral()
