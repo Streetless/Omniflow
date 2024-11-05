@@ -55,7 +55,7 @@ class Args(parser: ArgParser) {
         "--clear", "-c",
         help = "Clear directory version before uploading"
     ).default(false).addValidator {
-        if (mode != Mode.TEMPORARY)
+        if (mode != Mode.TEMPORARY && value)
             throw SystemExitException("Clear option is only available in temporary mode", 1)
     }
 

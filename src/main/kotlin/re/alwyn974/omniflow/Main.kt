@@ -7,7 +7,9 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -156,10 +158,16 @@ fun makeTemporaryVersion(args: Args, config: Config, minio: Minio) {
  * @return the manifest
  */
 fun getManifest(url: String): ManifestModel? = runBlocking {
-    val client = HttpClient(CIO)
+    val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json()
+        }
+    }
     try {
-        return@runBlocking client.get(url).body()
+        val manifest: ManifestModel =  client.get(url).body()
+        return@runBlocking manifest
     } catch (e: Exception) {
+        e.printStackTrace()
         logger.error { "Failed to get manifest from $url" }
         return@runBlocking null
     }
