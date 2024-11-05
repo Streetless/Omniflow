@@ -14,6 +14,25 @@ data class Config(
     val manifestUrl: String
 ) {
     companion object {
+        fun validateEnv(dotenv: Dotenv) {
+            val requiredKeys = listOf(
+                "MINIO_ACCESS_KEY",
+                "MINIO_SECRET_KEY",
+                "MINIO_ENDPOINT",
+                "MINIO_PORT",
+                "MINIO_USE_SSL",
+                "MINIO_TEMP_BUCKET_NAME",
+                "MINIO_EDITOR_BUCKET_NAME",
+                "MINIO_VR_BUCKET_NAME",
+                "MANIFEST_URL"
+            )
+
+            val missingKeys = requiredKeys.filter { dotenv[it] == null }
+            if (missingKeys.isNotEmpty()) {
+                throw IllegalArgumentException("Missing environment variables: $missingKeys")
+            }
+        }
+
         fun fromEnv(dotenv: Dotenv): Config {
             return Config(
                 dotenv.get("MINIO_ACCESS_KEY") ?: "minioadmin",

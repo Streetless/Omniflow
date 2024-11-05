@@ -25,7 +25,9 @@ import kotlin.io.path.isDirectory
 val logger = KotlinLogging.logger("OmniFlow")
 
 fun main(args: Array<String>) = mainBody {
-    val dotenv = dotenv()
+    val dotenv = dotenv {
+        ignoreIfMissing = true
+    }
 
     ArgParser(args).parseInto(::Args).run {
         logger.info { "Directory: $directory" }
@@ -35,6 +37,7 @@ fun main(args: Array<String>) = mainBody {
         logger.info { "Force clear: $clear" }
         logger.info { "Build Type: $buildType" }
 
+        Config.validateEnv(dotenv)
         val config = Config.fromEnv(dotenv)
         start(this, config)
     }
