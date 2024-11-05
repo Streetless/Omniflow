@@ -127,7 +127,7 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
     Files.writeString(manifestPath, json.encodeToString(manifest))
 
     files.forEach {
-        val fromPath = Path.of(args.projectType.name.lowercase(), it.path);
+        val fromPath = Path.of(args.projectType.name.lowercase(), it.path)
         logger.debug { "Uploading ${it.name} to $bucket from ${fromPath.toLinux()} to ${it.path}" }
         minio.copyFileFromBucket(config.tempBucketName, bucket, fromPath, Path.of(it.path))
     }
