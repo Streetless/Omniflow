@@ -181,7 +181,7 @@ fun getManifest(url: String): ManifestModel? = runBlocking {
  */
 fun addVersionOrReplace(manifest: ManifestModel, version: VersionManifest): ManifestModel {
     val newVersions = manifest.versions.toMutableList()
-    val index = newVersions.indexOfFirst { it.version == version.version }
+    val index = newVersions.indexOfFirst { it.version == version.version && it.type == version.type }
     if (index != -1)
         newVersions[index] = version
     else
