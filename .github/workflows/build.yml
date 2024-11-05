@@ -19,19 +19,10 @@ on:
       - '**[Dd]ocker*'
       - '.github/workflows/build.yml'
   workflow_dispatch:
-    inputs:
-      push:
-        description: 'Push to github maven repository'
-        required: true
-        type: boolean
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v')}}
-
-env:
-  DEPLOY: ${{ github.event.inputs.deploy || true }}
-  PUSH: ${{ github.event.inputs.push || true }}
 
 jobs:
   build:

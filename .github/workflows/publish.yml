@@ -1,0 +1,44 @@
+name: Publish Action
+
+on:
+  workflow_run:
+    workflows: ["Build Action"]
+    branches: "v*"
+    types:
+      - completed
+
+jobs:
+  download:
+    name: Download Artifact
+    runs-on: [ self-hosted, Linux, X64 ]
+    steps:
+      - name: Download artifact
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "OmniFlow"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/OmniFlow.zip`, Buffer.from(download.data));
+
+      - name: 'Unzip artifact'
+        run: unzip OmniFlow.zip
+
+      - name: Add to release
+        run: |
+          omniflowJar=$(find ./OmniFlow -name "-all.jar")
+          cp $omniflowJar $GITHUB_WORKSPACE
+          mv $GITHUB_WORKSPACE/$omniflowJar $GITHUB_WORKSPACE/OmniFlow.jar
+          gh release upload ${{ github.event.workflow_run.head_branch }} OmniFlow.jar
