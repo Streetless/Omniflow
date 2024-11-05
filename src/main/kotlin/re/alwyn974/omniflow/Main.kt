@@ -94,7 +94,7 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
         val size = it.toFile().length()
         val remotePath = prefix.resolve(relativePath)
         logger.debug { "Adding ${it.fileName} to version ${args.version} with remote path $remotePath" }
-        files.add(FileModel(relativePath.toString(), hash, size, remotePath.toLinux()))
+        files.add(FileModel(relativePath.toLinux(), hash, size, remotePath.toLinux()))
     }
 
     val version = VersionModel(args.version, args.buildType.name.lowercase(), files)
