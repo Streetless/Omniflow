@@ -1,6 +1,7 @@
 import org.gradle.internal.classpath.Instrumented.systemProperty
 
 plugins {
+    application
     kotlin("jvm") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("plugin.serialization") version "2.0.21"
@@ -35,7 +36,8 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-run {
+application {
+    mainClass = "re.alwyn974.omniflow.MainKt"
     systemProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG")
 }
 
