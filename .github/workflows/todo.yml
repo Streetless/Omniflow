@@ -1,0 +1,26 @@
+name: Todo Action
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+    inputs:
+      MANUAL_COMMIT_REF:
+        description: "The SHA of the commit to get the diff for"
+        required: true
+      MANUAL_BASE_REF:
+        description: "By default, the commit entered above is compared to the one directly before it; to go back further, enter an earlier SHA here"
+        required: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v')}}
+
+jobs:
+  todo-issues:
+    name: Todo Issues
+    uses: Streetless/actions/.github/workflows/todo.yml@main
+    with:
+      MANUAL_COMMIT_REF: ${{ github.event.inputs.MANUAL_COMMIT_REF }}
+      MANUAL_BASE_REF: ${{ github.event.inputs.MANUAL_BASE_REF }}

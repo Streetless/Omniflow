@@ -1,10 +1,12 @@
 import org.gradle.internal.classpath.Instrumented.systemProperty
+import java.net.URI
 
 plugins {
     application
     kotlin("jvm") version "2.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("plugin.serialization") version "2.0.21"
+    id("maven-publish")
 }
 
 group = "re.alwyn974.omniflow"
@@ -41,6 +43,10 @@ application {
     systemProperty("org.slf4j.simpleLogger.defaultLogLevel", "DEBUG")
 }
 
+tasks.build {
+    dependsOn(tasks.shadowJar)
+}
+
 tasks.test {
     useJUnitPlatform()
 }
@@ -51,4 +57,17 @@ kotlin {
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile>().configureEach {
     jvmTargetValidationMode.set(org.jetbrains.kotlin.gradle.dsl.jvm.JvmTargetValidationMode.WARNING)
+}
+
+publishing {
+    repositories {
+        maven {
+            name = "GitHubPackages"
+            url = URI("https://maven.pkg.github.com/StreetLess/OmniFlow")
+            credentials {
+                username = System.getenv("GITHUB_ACTOR")
+                password = System.getenv("GITHUB_TOKEN")
+            }
+        }
+    }
 }

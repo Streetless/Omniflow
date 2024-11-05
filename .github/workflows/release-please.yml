@@ -1,0 +1,16 @@
+name: Release Please Action
+
+on:
+  push:
+    branches: [ dev ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release Please
+    uses: Streetless/actions/.github/workflows/release-please.yml@main
+    secrets: inherit

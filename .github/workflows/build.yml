@@ -1,0 +1,67 @@
+name: Build Action
+
+on:
+  push:
+    branches: [main, dev]
+    tags: ['v*']
+    paths:
+      - '**.java'
+      - '**.kt'
+      - '*.gradle.kts'
+      - '**[Dd]ocker*'
+      - '.github/workflows/build.yml'
+  pull_request:
+    branches: [main, dev]
+    paths:
+      - '**.java'
+      - '**.kt'
+      - '*.gradle.kts'
+      - '**[Dd]ocker*'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+    inputs:
+      push:
+        description: 'Push to github maven repository'
+        required: true
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v')}}
+
+env:
+  DEPLOY: ${{ github.event.inputs.deploy || true }}
+  PUSH: ${{ github.event.inputs.push || true }}
+
+jobs:
+  build:
+    name: Build - Standalone
+    runs-on: [self-hosted, Linux, X64]
+    strategy:
+      fail-fast: true
+      matrix:
+        java-version: [21]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # ratchet:actions/checkout@v4
+
+      - name: Install java
+      - uses: actions/setup-java@8df1039502a15bceb9433410b1a100fbe190c53b # ratchet:actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          java-package: jdk
+          distribution: 'zulu'
+          cache: 'gradle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@d156388eb19639ec20ade50009f3d199ce1e2808 # ratchet:gradle/actions/setup-gradle@v4
+
+      - name: Build Package
+        run: ./gradlew build
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: OmniFlow
+          path: ./build/libs/OmniFlow-*-all.jar
+          if-no-files-found: error
