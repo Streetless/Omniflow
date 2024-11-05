@@ -62,8 +62,8 @@ jobs:
           ./gradlew build
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # ratchet:actions/upload-artifact@v4
         with:
           name: OmniFlow
-          path: ./build/libs/OmniFlow-*-all.jar
+          path: ./build/libs/*.jar
           if-no-files-found: error
