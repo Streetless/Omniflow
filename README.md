@@ -68,7 +68,12 @@
         <a href="#usage">Usage</a>
         <ul>
             <li><a href="#running">Running</a></li>
+            <li><a href="#cli">CLI</a></li>
+            <li><a href="#make-a-release">Make a Release</a></li>
         </ul>
+    </li>
+    <li>
+        <a href="#how-it-works">How it works</a>
     </li>
     <li>
         <a href="#build">Build</a>
@@ -193,6 +198,30 @@ optional arguments:
 
   --release, --debug      The build type
 ```
+
+### Make a Release
+
+To make a release from scratch, you need to make a temporary version, and then a release
+
+```bash
+# Push the content of /path/to/directory to the temporary bucket, for "editor" project type, with version 1.0.0, as a release type
+java -jar OmniFlow.jar --editor --temporary --version 1.0.0 --directory /path/to/directory --release
+# Make the release from the temporary bucket to the release bucket
+java -jar OmniFlow.jar --editor --version 1.0.0 --new --release
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- HIW -->
+## How it works
+
+When you run the jar, you specify:
+- `--editor` or `--simulator` to specify the project type (mandatory)
+- `--version` to specify the version (mandatory)
+- `--directory` to specify the directory to push (only when `--new` is not specified)
+- `--new` to specify that you want to create a new version (optional), you need to make a temporary version before
+- `--clear` to specify that you want to clear the directory version before uploading (optional) (only when `--new` is not specified)
+- `--release` or `--debug` to specify the build type (optional) (default: `--release)`
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
