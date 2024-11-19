@@ -32,7 +32,8 @@
       "pull-request-title-pattern": "chore(release): 🚀 Release ${version}",
       "extra-files": [
         "build.gradle.kts"
-      ]
+      ],
+      "release-type": "java"
     }
   },
   "plugins": [
