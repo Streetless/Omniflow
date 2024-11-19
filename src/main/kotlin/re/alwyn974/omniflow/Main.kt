@@ -94,7 +94,7 @@ fun makeNewVersion(args: Args, config: Config, minio: Minio) {
     logger.info { "Creating version files" }
     Files.walk(tempDir).filter(Predicate.not(Path::isDirectory)).forEach {
         val relativePath = tempDir.relativize(it)
-        val bytes = DigestUtils.digest(DigestUtils.getSha1Digest(), it.toFile())
+        val bytes = Files.readAllBytes(it)
         val hash = DigestUtils.sha1Hex(bytes)
         val size = it.toFile().length()
         val remotePath = prefix.resolve(relativePath)
