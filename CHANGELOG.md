@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.0.1](https://github.com/Streetless/Omniflow/compare/v1.0.0...v1.0.1) (2024-11-20)
+
+
+### 🐛 Bug Fixes
+
+* **files:** Sha1 was invalid ([5baf1b4](https://github.com/Streetless/Omniflow/commit/5baf1b4abd59257548d5cf7775a042441afd2ede))
+
+
+### 📚 Documentation
+
+* **readme:** Add more usage & "how it works" ([0086bac](https://github.com/Streetless/Omniflow/commit/0086bac04b440a3f1de6e2de5f83afe2c49f03f3))
+
+
+### 🔧 Build System
+
+* **deps:** ⬆️ Update actions/checkout digest to 11bd719 ([#2](https://github.com/Streetless/Omniflow/issues/2)) ([3b93129](https://github.com/Streetless/Omniflow/commit/3b931295445e0193673d56edc444e689f1de1f77))
+
+
+### 👷 Continuous Integration
+
+* **publish:** Should fix artifact upload to release ([abb917c](https://github.com/Streetless/Omniflow/commit/abb917c8e16cff2bc0cb5837c94ca03d0061e7a0))
+
+
+### 🔧 Other
+
+* Release 1.0.1 ([405af4a](https://github.com/Streetless/Omniflow/commit/405af4ac19504631cf6e3f7042ef5e957dfb6fd9))
+* **release-please:** Add back release type ([73db46c](https://github.com/Streetless/Omniflow/commit/73db46c73cdc207834e46b14fae39d1f6e37bd1e))
+
 ## 1.0.0 (2024-11-05)
 
 

@@ -11,7 +11,7 @@ plugins {
 
 group = "re.alwyn974.omniflow"
 // x-release-please-start-version
-version = "1.0.1-SNAPSHOT"
+version = "1.0.1"
 // x-release-please-end
 
 repositories {
