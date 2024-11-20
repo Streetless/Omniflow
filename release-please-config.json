@@ -33,7 +33,7 @@
       "extra-files": [
         "build.gradle.kts"
       ],
-      "release-type": "java"
+      "release-type": "simple"
     }
   },
   "plugins": [
