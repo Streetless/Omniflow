@@ -6,6 +6,7 @@ on:
     branches: "v*"
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   download:
@@ -38,7 +39,7 @@ jobs:
 
       - name: Add to release
         run: |
-          omniflowJar=$(find . -name "-all.jar")
+          omniflowJar=$(find . -name "*-all.jar")
           cp $omniflowJar $GITHUB_WORKSPACE
           mv $GITHUB_WORKSPACE/$omniflowJar $GITHUB_WORKSPACE/OmniFlow.jar
           gh release upload ${{ github.event.workflow_run.head_branch }} OmniFlow.jar
