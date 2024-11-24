@@ -19,10 +19,18 @@ on:
       - '**[Dd]ocker*'
       - '.github/workflows/build.yml'
   workflow_dispatch:
+    inputs:
+      upload-artifact:
+        description: 'Upload artifact'
+        required: false
+        default: 'false'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/v')}}
+
+env:
+  UPLOAD_ARTIFACT: ${{ github.event.inputs.upload-artifact || false }}
 
 jobs:
   build:
@@ -53,6 +61,7 @@ jobs:
           ./gradlew build
 
       - name: Upload artifact
+        if: ${{ env.UPLOAD_ARTIFACT == 'true' || startsWith(github.ref, 'refs/tags/v') }}
         uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # ratchet:actions/upload-artifact@v4
         with:
           name: OmniFlow
