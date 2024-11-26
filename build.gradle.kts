@@ -23,7 +23,7 @@ repositories {
 }
 
 dependencies {
-    implementation("io.minio:minio:8.5.13")
+    implementation("io.minio:minio:8.5.14")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
