@@ -27,7 +27,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.2")
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.0")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
     implementation("org.slf4j:slf4j-simple:2.0.3")
 
     val ktorVersion = "3.0.1"
