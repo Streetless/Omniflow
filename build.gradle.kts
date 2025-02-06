@@ -3,7 +3,7 @@ import java.net.URI
 
 plugins {
     application
-    kotlin("jvm") version "2.1.0"
+    kotlin("jvm") version "2.1.10"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     kotlin("plugin.serialization") version "2.1.0"
     id("maven-publish")
