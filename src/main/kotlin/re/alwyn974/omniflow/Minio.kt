@@ -3,13 +3,37 @@ package re.alwyn974.omniflow
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.minio.*
 import io.minio.messages.Item
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.Response
+import re.alwyn974.omniflow.Extensions.Companion.toLinux
 import re.alwyn974.omniflow.config.Config
+import java.io.IOException
 import java.nio.file.FileVisitOption
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 import kotlin.io.path.isDirectory
-import re.alwyn974.omniflow.Extensions.Companion.toLinux
+
+class RetryInterceptor(private val maxRetries: Int) : Interceptor {
+    @Throws(IOException::class)
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request: Request = chain.request()
+        var exception: IOException? = null
+        for (i in 0..<maxRetries) {
+            try {
+                return chain.proceed(request)
+            } catch (e: IOException) {
+                exception = e
+                // Log retry attempt
+                println("Retry attempt " + (i + 1) + " for request: " + request.url)
+            }
+        }
+        throw exception!! // Throw last exception if all retries fail
+    }
+}
 
 class Minio : AutoCloseable {
     private val logger = KotlinLogging.logger("Minio")
@@ -20,8 +44,15 @@ class Minio : AutoCloseable {
      * @param config The Minio configuration
      */
     fun init(config: Config) {
+        val client: OkHttpClient = OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .addInterceptor(RetryInterceptor(3))
+            .build()
         minioClient = MinioClient.builder()
             .endpoint(config.endpoint, config.port, config.useSSL)
+            .httpClient(client, true)
             .credentials(config.accessKey, config.secretKey)
             .build()
     }
@@ -73,7 +104,10 @@ class Minio : AutoCloseable {
         logger.debug { "Uploading directory $dir to $bucketName" }
         return Files.walk(dir, FileVisitOption.FOLLOW_LINKS).use { paths ->
             paths.filter { !it.isDirectory() }
-                .map { uploadFile(bucketName, it, dir.relativize(it), prefix) }
+                .map {
+                    Thread.sleep(1000L)
+                    uploadFile(bucketName, it, dir.relativize(it), prefix)
+                }
                 .collect(Collectors.toList())
         }
     }
