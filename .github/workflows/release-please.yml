@@ -14,3 +14,5 @@ jobs:
     name: Release Please
     uses: Streetless/actions/.github/workflows/release-please.yml@main
     secrets: inherit
+    with:
+      runs-on: 'ubuntu-latest'

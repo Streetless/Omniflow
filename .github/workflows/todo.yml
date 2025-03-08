@@ -24,3 +24,4 @@ jobs:
     with:
       MANUAL_COMMIT_REF: ${{ github.event.inputs.MANUAL_COMMIT_REF }}
       MANUAL_BASE_REF: ${{ github.event.inputs.MANUAL_BASE_REF }}
+      runs-on: 'ubuntu-latest'

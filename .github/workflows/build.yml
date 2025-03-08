@@ -35,7 +35,7 @@ env:
 jobs:
   build:
     name: Build - Standalone
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: true
       matrix:
