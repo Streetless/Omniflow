@@ -1,5 +1,47 @@
 # Changelog
 
+## [1.1.0](https://github.com/Streetless/Omniflow/compare/v1.0.2...v1.1.0) (2025-04-21)
+
+
+### ✨ Features
+
+* **minio:** Add RetryInterceptor & timeouts to OkHttpClient ([e7d6de4](https://github.com/Streetless/Omniflow/commit/e7d6de40fde306899be0fc46431bd95cd9576aec))
+
+
+### 🔧 Build System
+
+* **deps:** ⬆️ Update actions/setup-java digest to 7a6d8a8 ([#21](https://github.com/Streetless/Omniflow/issues/21)) ([cc0dc8e](https://github.com/Streetless/Omniflow/commit/cc0dc8eca94463b4cb6b885489ccfed7686184c9))
+* **deps:** ⬆️ Update actions/setup-java digest to c5195ef ([#27](https://github.com/Streetless/Omniflow/issues/27)) ([df5e935](https://github.com/Streetless/Omniflow/commit/df5e93561caee8d8a2a89562622eefac798cac76))
+* **deps:** ⬆️ Update actions/upload-artifact digest to 6f51ac0 ([#20](https://github.com/Streetless/Omniflow/issues/20)) ([9097f2c](https://github.com/Streetless/Omniflow/commit/9097f2cce36c2eff64054616f7dc7ee820d07da1))
+* **deps:** ⬆️ Update actions/upload-artifact digest to ea165f8 ([#24](https://github.com/Streetless/Omniflow/issues/24)) ([c933ee5](https://github.com/Streetless/Omniflow/commit/c933ee548a40c49afb9039aec9711d4137694c2f))
+* **deps:** ⬆️ Update dependency io.github.cdimascio:dotenv-kotlin to v6.5.0 ([#19](https://github.com/Streetless/Omniflow/issues/19)) ([ed3e9b4](https://github.com/Streetless/Omniflow/commit/ed3e9b4b5d41e708cce7b918c110f443d03b400d))
+* **deps:** ⬆️ Update dependency io.github.cdimascio:dotenv-kotlin to v6.5.1 ([#32](https://github.com/Streetless/Omniflow/issues/32)) ([448a85b](https://github.com/Streetless/Omniflow/commit/448a85b7d519fa3d7e17ede55fdd1f5971210fbc))
+* **deps:** ⬆️ Update dependency io.github.oshai:kotlin-logging-jvm to v7.0.3 ([#17](https://github.com/Streetless/Omniflow/issues/17)) ([1219658](https://github.com/Streetless/Omniflow/commit/1219658ad0f27ccfe21f4cf53b755a935bcf7786))
+* **deps:** ⬆️ Update dependency io.github.oshai:kotlin-logging-jvm to v7.0.7 ([#30](https://github.com/Streetless/Omniflow/issues/30)) ([5b95457](https://github.com/Streetless/Omniflow/commit/5b954572ea17fa791df94ff8a547b0d82f709623))
+* **deps:** ⬆️ Update dependency io.minio:minio to v8.5.14 ([#15](https://github.com/Streetless/Omniflow/issues/15)) ([6c1be69](https://github.com/Streetless/Omniflow/commit/6c1be6919e44dedd669296371d88fd0ba5b4fd11))
+* **deps:** ⬆️ Update dependency org.jetbrains.kotlinx:kotlinx-serialization-json to v1.8.1 ([#22](https://github.com/Streetless/Omniflow/issues/22)) ([6a61026](https://github.com/Streetless/Omniflow/commit/6a610262aacb760a7ebcad881d2eac20c57e82a5))
+* **deps:** ⬆️ Update dependency org.slf4j:slf4j-simple to v2.0.16 ([#3](https://github.com/Streetless/Omniflow/issues/3)) ([172bdd3](https://github.com/Streetless/Omniflow/commit/172bdd34c95c6bdd76f63781b19be8a0fe7ce4d3))
+* **deps:** ⬆️ Update dependency org.slf4j:slf4j-simple to v2.0.17 ([#33](https://github.com/Streetless/Omniflow/issues/33)) ([4420ac0](https://github.com/Streetless/Omniflow/commit/4420ac0f4f21279f3a58cd821fff9c3a2b1d6a61))
+* **deps:** ⬆️ Update ktor monorepo to v3.1.2 ([#31](https://github.com/Streetless/Omniflow/issues/31)) ([51f4af1](https://github.com/Streetless/Omniflow/commit/51f4af1a1df9147906d8b71726b2d4965a753089))
+* **deps:** ⬆️ Update plugin org.gradle.toolchains.foojay-resolver-convention to v0.10.0 ([#35](https://github.com/Streetless/Omniflow/issues/35)) ([2fcfd5b](https://github.com/Streetless/Omniflow/commit/2fcfd5b5aa5f3a05fa512ac3ba4d6db831d5e45e))
+* **deps:** ⬆️ Update plugin org.gradle.toolchains.foojay-resolver-convention to v0.9.0 ([#10](https://github.com/Streetless/Omniflow/issues/10)) ([43d7d05](https://github.com/Streetless/Omniflow/commit/43d7d0592bf9c9e7cb61a4474337597c421642fb))
+* **deps:** ⬆️ Update plugin org.jetbrains.kotlin.jvm to v2.1.20 ([#34](https://github.com/Streetless/Omniflow/issues/34)) ([da5639d](https://github.com/Streetless/Omniflow/commit/da5639d51db02ef919a6e1847188fd31f4e46e68))
+* **deps:** ⬆️ Update plugin org.jetbrains.kotlin.plugin.serialization to v2.1.0 ([#16](https://github.com/Streetless/Omniflow/issues/16)) ([6a16d9e](https://github.com/Streetless/Omniflow/commit/6a16d9e5d4cbc3e5c747fcc76035a6893cab9b68))
+* **deps:** ⬆️ Update plugin org.jetbrains.kotlin.plugin.serialization to v2.1.20 ([#29](https://github.com/Streetless/Omniflow/issues/29)) ([f36248f](https://github.com/Streetless/Omniflow/commit/f36248f73b5eba05b22e008b9920831286ee35e2))
+* **deps:** Update gradle to v8.12 ([c13dd00](https://github.com/Streetless/Omniflow/commit/c13dd005e220a8237689a9005a43f68f9059785f))
+* **deps:** Update Gradle to v8.13 and Kotlin serialization plugin to v2.1.10 ([a0891ec](https://github.com/Streetless/Omniflow/commit/a0891ec810553f78ab952b1010b1bdc6e20303e8))
+* **deps:** Update io.minio:minio to v8.5.17 ([336c3a6](https://github.com/Streetless/Omniflow/commit/336c3a6f8ef4007be8216ccabbfecd53094c7abc))
+* **deps:** Update kotlin to v2.1.0 ([ad78c1c](https://github.com/Streetless/Omniflow/commit/ad78c1c44dd00324d593db5f1ea0b11929693475))
+* **deps:** Update kotlin to v2.1.10 ([a9ae8be](https://github.com/Streetless/Omniflow/commit/a9ae8beab0cfd07af381e06a4c34c7e2e2a869af))
+* **deps:** Update ktor monorepo to v3.0.3 ([9aafc20](https://github.com/Streetless/Omniflow/commit/9aafc20ca456ad4f553824034b9fb97078bd6e85))
+
+
+### 👷 Continuous Integration
+
+* 👷 Update workflows to use 'ubuntu-latest' for open sourcing ([b51d0d7](https://github.com/Streetless/Omniflow/commit/b51d0d75439aa0e2b6e73148a0f2c98d63e264ae))
+* **build:** Add condition for artifact upload ([27e54b3](https://github.com/Streetless/Omniflow/commit/27e54b3a385bee1172fb1286b68565f3290f5eef))
+* **release-please:** Fix label ([b812fa1](https://github.com/Streetless/Omniflow/commit/b812fa11d47de53842d9437dd37601adebbfa1a8))
+
 ## [1.0.2](https://github.com/Streetless/Omniflow/compare/v1.0.1...v1.0.2) (2024-11-20)
 
 
