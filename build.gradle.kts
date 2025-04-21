@@ -11,7 +11,7 @@ plugins {
 
 group = "re.alwyn974.omniflow"
 // x-release-please-start-version
-version = "1.0.2"
+version = "1.1.0"
 // x-release-please-end
 
 repositories {
@@ -27,10 +27,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
     implementation("com.xenomachina:kotlin-argparser:2.0.7")
     implementation("io.github.cdimascio:dotenv-kotlin:6.5.1")
-    implementation("io.github.oshai:kotlin-logging-jvm:7.0.3")
+    implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
     implementation("org.slf4j:slf4j-simple:2.0.17")
 
-    val ktorVersion = "3.0.3"
+    val ktorVersion = "3.1.2"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
