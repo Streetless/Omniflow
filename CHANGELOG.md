@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.1](https://github.com/Streetless/Omniflow/compare/v1.1.0...v1.1.1) (2025-04-25)
+
+
+### 🔧 Build System
+
+* **deps:** ⬆️ Update actions/github-script action to v7 ([#36](https://github.com/Streetless/Omniflow/issues/36)) ([4794bdb](https://github.com/Streetless/Omniflow/commit/4794bdb160d8bb57f0f36bdeb11cdd1632ee2e32))
+* **deps:** ⬆️ Update dependency gradle to v8.14 ([#39](https://github.com/Streetless/Omniflow/issues/39)) ([708f855](https://github.com/Streetless/Omniflow/commit/708f855c24f5a71bf1603f677d567890deab2eef))
+* **deps:** ⬆️ Update plugin com.github.johnrengelman.shadow to v8 ([#37](https://github.com/Streetless/Omniflow/issues/37)) ([1d13e08](https://github.com/Streetless/Omniflow/commit/1d13e0868e7f66e48023bb9edf68d210cea291c5))
+
 ## [1.1.0](https://github.com/Streetless/Omniflow/compare/v1.0.2...v1.1.0) (2025-04-21)
 
 
