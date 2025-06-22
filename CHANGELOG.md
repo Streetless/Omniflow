@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.2](https://github.com/Streetless/Omniflow/compare/v1.1.1...v1.1.2) (2025-06-22)
+
+
+### 🔧 Build System
+
+* **deps:** Update Gradle to v8.14.2 ([db07c64](https://github.com/Streetless/Omniflow/commit/db07c645454309ece7756dbf37d32bf20a87b213))
+* **deps:** Update Kotlin to v2.1.21 ([5a6b993](https://github.com/Streetless/Omniflow/commit/5a6b99346df218ec36f25f3adb89f7ebfbadf403))
+* **deps:** Update Ktor to v3.2.0 ([986a6a7](https://github.com/Streetless/Omniflow/commit/986a6a7e2d24fbfbd2636955f1b01172efb20a5e))
+
 ## [1.1.1](https://github.com/Streetless/Omniflow/compare/v1.1.0...v1.1.1) (2025-04-25)
 
 
