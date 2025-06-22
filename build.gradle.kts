@@ -3,15 +3,15 @@ import java.net.URI
 
 plugins {
     application
-    kotlin("jvm") version "2.1.20"
+    kotlin("jvm") version "2.1.21"
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    kotlin("plugin.serialization") version "2.1.20"
+    kotlin("plugin.serialization") version "2.1.21"
     id("maven-publish")
 }
 
 group = "re.alwyn974.omniflow"
 // x-release-please-start-version
-version = "1.1.1"
+version = "1.1.2"
 // x-release-please-end
 
 repositories {
@@ -30,7 +30,7 @@ dependencies {
     implementation("io.github.oshai:kotlin-logging-jvm:7.0.7")
     implementation("org.slf4j:slf4j-simple:2.0.17")
 
-    val ktorVersion = "3.1.2"
+    val ktorVersion = "3.2.0"
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
